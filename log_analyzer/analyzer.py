@@ -3,44 +3,102 @@ import argparse
 import logging
 import json
 import ntpath
+import re
 
 from datetime import datetime
-
-from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search
+from multiprocessing import Pool
+from itertools import repeat
 
 from log_analyzer.indexer import Indexer
+from log_analyzer.parser_data import ParserData
 
+DEBUG = True
+
+PATTERNS = "patterns"
+PATTERN = "pattern"
+JOB_ID = "job_id"
+RESERVATION_ID = "reservation_id"
+TOPOLOGY_ID = "topology_id"
 CONFIG = {
-    ""
+    PATTERNS: {
+        "Blueprint resolution": {
+            "log_files": [
+                "JobPerformance.txt.*"
+            ],
+            "lookup": [
+                {
+                    "name": "start reservation",
+                    "search_str": "Start Topology resolve for Job",
+                    "index": [
+                        {
+                            "name": JOB_ID,
+                            "start_delimiter": "resolve for Job",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": RESERVATION_ID,
+                            "start_delimiter": "creating Reservation",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": TOPOLOGY_ID,
+                            "start_delimiter": "Topology Id",
+                            "end_delimiter": ","
+                        }
+                    ]
+                },
+                {
+                    "name": "end reservation",
+                    "search_str": "Topology resolve Succeeded for Job",
+                    "index": [
+                        {
+                            "name": JOB_ID,
+                            "start_delimiter": "for Job",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": RESERVATION_ID,
+                            "start_delimiter": "creating Reservation",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": TOPOLOGY_ID,
+                            "start_delimiter": "Topology Id",
+                            "end_delimiter": ","
+                        }
+                    ]
+                }
+            ]
+        }
+    }
 }
 
 def set_logger():
+    formatter = '%(asctime)s >> %(processName)s %(threadName)s >> %(name)-6s %(levelname)-8s %(message)s'
     logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    format=formatter,
                     datefmt='%m-%d %H:%M',
                     # filename='/var/log/app.log',
                     filemode='a')
+    fh = logging.FileHandler('log_analyzer.log')
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(logging.Formatter(formatter))
+    logging.getLogger().addHandler(fh)
 
-def setup_elastic():
-    es = Elasticsearch()
-    return es
 
 def _get_parse_data(parse_file_path):
     parse_data = None
     if parse_file_path is None:
-        parse_file_path = CONFIG
+        parse_data = CONFIG
     else:
         if os.path.exists(parse_file_path) is False:
-            return None
+            raise FileNotFoundError(parse_file_path)
         with open(parse_file_path, 'r') as f:
             parse_data = json.load(f)
     return parse_data
 
-def _get_giles_to_search(parse_data):
-    return []
-
 def _get_all_full_path_files_in_dir(dir_name):
+    """ get all logs to read """
     files = []
     for dirpath, _, filenames in os.walk(dir_name):
         for _file in filenames:
@@ -51,19 +109,40 @@ def _path_leaf(path):
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
 
-def index_logs(log_folder_path, parse_file_path, elasticsearch_instances):
-    parse_data = _get_parse_data(parse_file_path)
-    
-    # get all the files from the config to search
-    files_to_search = _get_giles_to_search(parse_data)
-
-    # get all logs to read
+def _get_relevant_files_from_pattern(parse_data_handler, log_folder_path):
+    files_pattern_to_search = parse_data_handler.get_all_files()
     files = _get_all_full_path_files_in_dir(log_folder_path)
-    relevant_files = [f for f in files if _path_leaf(f) in files_to_search]
-    for _file in relevant_files:
-        _indexer = Indexer(elasticsearch_instances, _file, parse_data)
-        _indexer.index()
+    relevant_files = []
+    for f in files:
+        file_name = _path_leaf(f)
+        for pattern in files_pattern_to_search:
+            if bool(re.match(pattern, file_name)) is True:
+                relevant_files.append(f)
+    return relevant_files
 
+def _index_file(_file, parse_data):
+    if os.path.exists(_file) is False:
+        logging.warn("Log file {} not found".format(_file))
+        raise FileNotFoundError(_file)
+    else:
+        parser_data_object = ParserData(parse_data)
+        _indexer = Indexer(_file, parser_data_object)
+        return _indexer.index()
+
+
+def index_logs(log_folder_path, parse_file_path):
+    parse_data = _get_parse_data(parse_file_path)
+    parse_data_handler = ParserData(parse_data)
+    relevant_files = _get_relevant_files_from_pattern(parse_data_handler, log_folder_path)
+
+    results = []
+    if DEBUG: # remove parallel
+        for _file in relevant_files:
+            results.append(_index_file(_file, parse_data))
+    else:
+        with Pool(processes=10) as _pool:
+            results = _pool.starmap(_index_file, zip(relevant_files, repeat(parse_data)))
+    print (results)
 
 
 def main(log_folder_path, parse_file_path):
@@ -73,8 +152,7 @@ def main(log_folder_path, parse_file_path):
     logging.info("######   Quali  Analyzer   ######")
     logging.info("#################################")
     logging.info("")
-    es = setup_elastic()
-    index_logs(log_folder_path, parse_file_path, es)
+    index_logs(log_folder_path, parse_file_path)
 
 
 
