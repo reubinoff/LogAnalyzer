@@ -1,11 +1,12 @@
 import logging 
 
+from log_analyzer.elastic_handler import get_elastic
 
 class Indexer(object):
-    def __init__(self, elasticsearch_instances, file_to_index, parser_data):
-        self._es = elasticsearch_instances
+    def __init__(self, file_to_index, parser_data):
+        self._es = get_elastic()
         self._file = file_to_index
-        self._parser = parser_data
+        self._parser_data_object = parser_data
     
     def _get_lines(self):
         lines = None
@@ -15,9 +16,60 @@ class Indexer(object):
 
     def index(self):
         lines = self._get_lines()
+        parsers = self._parser_data_object.get_parsers_for_file_name(self._file)
+        for l in lines:
+            res = self._es.index(index="moshe", doc_type='tweet',  body={"message": l})
         logging.info("Total scanned lines in file {} is {}".format(self._file, len(lines)))
-
         return True
+    
         
 
-        
+#   "Blueprint resolution": {
+#             "log_files": [
+#                 "JobPerformance.txt.*"
+#             ],
+#             "lookup": [
+#                 {
+#                     "name": "start reservation",
+#                     "search": "Start Topology resolve for Job",
+#                     "index": [
+#                         {
+#                             "name": JOB_ID,
+#                             "start_delimiter": "resolve for Job",
+#                             "end_delimiter": ","
+#                         },
+#                         {
+#                             "name": RESERVATION_ID,
+#                             "start_delimiter": "creating Reservation",
+#                             "end_delimiter": ","
+#                         },
+#                         {
+#                             "name": TOPOLOGY_ID,
+#                             "start_delimiter": "Topology Id",
+#                             "end_delimiter": ","
+#                         }
+#                     ]
+#                 },
+#                 {
+#                     "name": "end reservation",
+#                     "search": "Topology resolve Succeeded for Job",
+#                     "index": [
+#                         {
+#                             "name": JOB_ID,
+#                             "start_delimiter": "for Job",
+#                             "end_delimiter": ","
+#                         },
+#                         {
+#                             "name": RESERVATION_ID,
+#                             "start_delimiter": "creating Reservation",
+#                             "end_delimiter": ","
+#                         },
+#                         {
+#                             "name": TOPOLOGY_ID,
+#                             "start_delimiter": "Topology Id",
+#                             "end_delimiter": ","
+#                         }
+#                     ]
+#                 }
+#             ]
+#         }
