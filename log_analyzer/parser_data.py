@@ -1,6 +1,7 @@
 import logging
 import ntpath
 import re
+import datetime
 
 class ParseLookupIndex(object):
     """
@@ -11,9 +12,17 @@ class ParseLookupIndex(object):
     }
     """
 
+    def _datetime(self, val):
+        date_time_obj = datetime.datetime.strptime(val, '%Y-%m-%d %H:%M:%S,%f')
+        return date_time_obj.timestamp()
+
+    def _str(self, val):
+        return val
+
     def __init__(self, lookup_index_raw_data):
         self._lookup_index_raw_data = lookup_index_raw_data
         self._name = None
+        self._type = "str"
         self._start_delimiter = None
         self._end_delimiter = None
         self._parse()
@@ -24,9 +33,23 @@ class ParseLookupIndex(object):
         if "start_delimiter" not in self._lookup_index_raw_data:
             raise KeyError("start_delimiter")
         self._name = self._lookup_index_raw_data["name"]
+        self._type = self._lookup_index_raw_data.get("type")
         self._start_delimiter = self._lookup_index_raw_data["start_delimiter"]
         self._end_delimiter = self._lookup_index_raw_data.get("end_delimiter")
     
+    def index_data(self, str_to_check):
+        index_start = 0 if self._start_delimiter is None else str_to_check.index(self._start_delimiter)
+        l = 0 if self._start_delimiter is None else  len(self._start_delimiter)
+        f1 = str_to_check[index_start + l:]
+        index_end = f1.index(self._end_delimiter)
+        f2 = f1[:index_end]
+        f3 = f2.strip()
+        f3 = f3 if self._type is None else getattr(self, "_" + self._type)(f3)
+
+        return {
+            "name": self._name,
+            "value": f3
+        }
 
 class ParseLookup(object):
     """
@@ -37,7 +60,8 @@ class ParseLookup(object):
             {
                 "name": JOB_ID,
                 "start_delimiter": "resolve for Job",
-                "end_delimiter": ","
+                "end_delimiter": ",",
+
             }
         ]
     }
@@ -50,6 +74,16 @@ class ParseLookup(object):
         self._parse()
         
 
+    def _create_default_time_index(self):
+        index =  {
+            "name": "time",
+            "start_delimiter": None,
+            "end_delimiter": "[",
+            "type": "datetime"
+        }
+        p = ParseLookupIndex(index)
+        self._index.append(p)
+
     def _parse(self):
         if "name" not in self._lookup_raw_data:
             raise KeyError("name")
@@ -59,9 +93,24 @@ class ParseLookup(object):
             raise KeyError("index")
         self._name = self._lookup_raw_data["name"]
         self._search_str = self._lookup_raw_data["search_str"]
+        self._create_default_time_index()
         for index in self._lookup_raw_data["index"]:
             p = ParseLookupIndex(index)
             self._index.append(p)
+    
+    def can_parsed_string(self, str_to_check):
+        if isinstance(str_to_check, str) is False:
+            return False
+        return self._search_str.lower() in str_to_check.lower()
+    
+    def index_parsed_data(self, str_to_check):
+        if self.can_parsed_string(str_to_check) is False:
+            return False
+        index_data = []
+        for index in self._index:
+            index_data.append(index.index_data(str_to_check))
+        return index_data
+
 
 
 class SignleParseData(object):
@@ -97,6 +146,18 @@ class SignleParseData(object):
     def is_parser_relevant_for_file(self, file_name):
         _file_name = self._get_file_name(file_name)
         return any([ bool(re.match(f, _file_name)) is True for f in self._log_files])
+
+    def parse_string(self, str_to_check):
+        index = {}
+        for lookup in self._lookup_parsers:
+            val = lookup.index_parsed_data(str_to_check)
+            if isinstance(val, bool) is False and len(val) > 0:
+                index.update({lookup._name: val})
+        return index
+
+
+
+
 
 class ParserData(object):
     def __init__(self, parse_raw_data):

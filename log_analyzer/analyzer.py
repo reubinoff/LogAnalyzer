@@ -27,7 +27,7 @@ CONFIG = {
             ],
             "lookup": [
                 {
-                    "name": "start reservation",
+                    "name": "start_reservation",
                     "search_str": "Start Topology resolve for Job",
                     "index": [
                         {
@@ -48,7 +48,7 @@ CONFIG = {
                     ]
                 },
                 {
-                    "name": "end reservation",
+                    "name": "end_reservation",
                     "search_str": "Topology resolve Succeeded for Job",
                     "index": [
                         {
