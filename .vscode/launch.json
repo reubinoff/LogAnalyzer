@@ -5,13 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File (Integrated Terminal)",
+            "name": "Python: Current File",
             "type": "python",
             "request": "launch",
             "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: analyzer",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\log_analyzer\\analyzer.py",
             "console": "integratedTerminal",
             "args": [
-                "--logs-folder", "c:/tmp"
+                "--logs-folder",
+                "c:/tmp"
             ],
         },
         {
