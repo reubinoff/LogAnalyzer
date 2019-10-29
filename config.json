@@ -1,0 +1,53 @@
+{
+    "patterns": {
+        "Blueprint resolution": {
+            "log_files": [
+                "JobPerformance.txt.*"
+            ],
+            "lookup": [
+                {
+                    "name": "start_reservation",
+                    "search_str": "Start Topology resolve for Job",
+                    "index": [
+                        {
+                            "name": "job_id",
+                            "start_delimiter": "resolve for Job",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "reservation_id",
+                            "start_delimiter": "creating Reservation",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "topology_id",
+                            "start_delimiter": "Topology Id",
+                            "end_delimiter": ","
+                        }
+                    ]
+                },
+                {
+                    "name": "end_reservation",
+                    "search_str": "Topology resolve Succeeded for Job",
+                    "index": [
+                        {
+                            "name": "job_id",
+                            "start_delimiter": "for Job",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "reservation_id",
+                            "start_delimiter": "creating Reservation",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "topology_id",
+                            "start_delimiter": "Topology Id",
+                            "end_delimiter": ","
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
