@@ -13,65 +13,7 @@ from log_analyzer.indexer import Indexer
 from log_analyzer.parser_data import ParserData
 
 DEBUG = True
-
-PATTERNS = "patterns"
-PATTERN = "pattern"
-JOB_ID = "job_id"
-RESERVATION_ID = "reservation_id"
-TOPOLOGY_ID = "topology_id"
-CONFIG = {
-    PATTERNS: {
-        "Blueprint resolution": {
-            "log_files": [
-                "JobPerformance.txt.*"
-            ],
-            "lookup": [
-                {
-                    "name": "start_reservation",
-                    "search_str": "Start Topology resolve for Job",
-                    "index": [
-                        {
-                            "name": JOB_ID,
-                            "start_delimiter": "resolve for Job",
-                            "end_delimiter": ","
-                        },
-                        {
-                            "name": RESERVATION_ID,
-                            "start_delimiter": "creating Reservation",
-                            "end_delimiter": ","
-                        },
-                        {
-                            "name": TOPOLOGY_ID,
-                            "start_delimiter": "Topology Id",
-                            "end_delimiter": ","
-                        }
-                    ]
-                },
-                {
-                    "name": "end_reservation",
-                    "search_str": "Topology resolve Succeeded for Job",
-                    "index": [
-                        {
-                            "name": JOB_ID,
-                            "start_delimiter": "for Job",
-                            "end_delimiter": ","
-                        },
-                        {
-                            "name": RESERVATION_ID,
-                            "start_delimiter": "creating Reservation",
-                            "end_delimiter": ","
-                        },
-                        {
-                            "name": TOPOLOGY_ID,
-                            "start_delimiter": "Topology Id",
-                            "end_delimiter": ","
-                        }
-                    ]
-                }
-            ]
-        }
-    }
-}
+ 
 
 def set_logger():
     formatter = '%(asctime)s >> %(processName)s %(threadName)s >> %(name)-6s %(levelname)-8s %(message)s'
@@ -89,7 +31,9 @@ def set_logger():
 def _get_parse_data(parse_file_path):
     parse_data = None
     if parse_file_path is None:
-        parse_data = CONFIG
+        dir_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        with open(os.path.join(dir_path, "config.json"), "r") as f:
+            parse_data = json.load(f)
     else:
         if os.path.exists(parse_file_path) is False:
             raise FileNotFoundError(parse_file_path)

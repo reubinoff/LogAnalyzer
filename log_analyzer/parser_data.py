@@ -41,7 +41,7 @@ class ParseLookupIndex(object):
         index_start = 0 if self._start_delimiter is None else str_to_check.index(self._start_delimiter)
         l = 0 if self._start_delimiter is None else  len(self._start_delimiter)
         f1 = str_to_check[index_start + l:]
-        index_end = f1.index(self._end_delimiter)
+        index_end = -1 if self._end_delimiter is None else f1.index(self._end_delimiter)
         f2 = f1[:index_end]
         f3 = f2.strip()
         f3 = f3 if self._type is None else getattr(self, "_" + self._type)(f3)
@@ -200,59 +200,3 @@ class ParserData(object):
         """ get parser which relevant for specific file """
         parsers = [p for p in self._parsers if p.is_parser_relevant_for_file(file_name) is True]
         return parsers
-
-# CONFIG = {
-#     PATTERNS: {
-#         "Blueprint resolution": {
-#             "log_files": [
-#                 "JobPerformance.txt.*"
-#             ],
-#             "lookup": [
-#                 {
-#                     "name": "start reservation",
-#                     "search": "Start Topology resolve for Job",
-#                     "index": [
-#                         {
-#                             "name": JOB_ID,
-#                             "start_delimiter": "resolve for Job",
-#                             "end_delimiter": ","
-#                         },
-#                         {
-#                             "name": RESERVATION_ID,
-#                             "start_delimiter": "creating Reservation",
-#                             "end_delimiter": ","
-#                         },
-#                         {
-#                             "name": TOPOLOGY_ID,
-#                             "start_delimiter": "Topology Id",
-#                             "end_delimiter": ","
-#                         }
-#                     ]
-#                 },
-#                 {
-#                     "name": "end reservation",
-#                     "search": "Topology resolve Succeeded for Job",
-#                     "index": [
-#                         {
-#                             "name": JOB_ID,
-#                             "start_delimiter": "for Job",
-#                             "end_delimiter": ","
-#                         },
-#                         {
-#                             "name": RESERVATION_ID,
-#                             "start_delimiter": "creating Reservation",
-#                             "end_delimiter": ","
-#                         },
-#                         {
-#                             "name": TOPOLOGY_ID,
-#                             "start_delimiter": "Topology Id",
-#                             "end_delimiter": ","
-#                         }
-#                     ]
-#                 }
-#             ]
-#         }
-#     }
-
-
-# }

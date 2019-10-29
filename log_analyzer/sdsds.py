@@ -7,3 +7,7 @@ print('Date:', date_time_obj.date())
 print('Time:', date_time_obj.time())
 print('Date-time:', date_time_obj)
 print('Date-time:', date_time_obj.timestamp())
+
+
+a = "asdafs dfsdf sdf sdf sd f"
+print(a[11:-1])
