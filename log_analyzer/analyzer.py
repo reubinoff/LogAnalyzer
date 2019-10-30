@@ -13,6 +13,7 @@ from log_analyzer.indexer import Indexer
 from log_analyzer.parser_data import ParserData
 from log_analyzer.analyzer_engine import AnalyzerEngine
 from log_analyzer.elastic_handler import put_mapping
+from log_analyzer.report_manager import ReportManager
 
 DEBUG = True
  
@@ -100,11 +101,17 @@ def main(log_folder_path, parse_file_path):
     logging.info("")
     parse_data = _get_parse_data(parse_file_path)
     parse_data_handler = ParserData(parse_data)
+    
+    # index results in ES
     index_logs(log_folder_path, parse_data_handler)
+
+    # analyze ES data
     results = analyze_logs(parse_data)
-    RESUL_FILE = "log_analyzer_result.json"
-    with open(RESUL_FILE, 'w') as f:
-        json.dump(results, f, indent=4)
+
+    #publish the results
+    reporter = ReportManager(parse_data["report"], results)
+    reporter.publish()
+
 
 
 
