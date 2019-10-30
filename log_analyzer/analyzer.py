@@ -13,6 +13,7 @@ from log_analyzer.indexer import Indexer
 from log_analyzer.parser_data import ParserData
 from log_analyzer.analyzer_engine import AnalyzerEngine
 from log_analyzer.elastic_handler import put_mapping
+from log_analyzer.report_manager import ReportManager
 
 DEBUG = True
  
@@ -66,36 +67,24 @@ def _get_relevant_files_from_pattern(parse_data_handler, log_folder_path):
                 relevant_files.append(f)
     return relevant_files
 
-def _index_file(_file, parse_data):
-    if os.path.exists(_file) is False:
-        logging.warn("Log file {} not found".format(_file))
-        raise FileNotFoundError(_file)
-    else:
-        parser_data_object = ParserData(parse_data)
-        _indexer = Indexer(_file, parser_data_object)
-        return _indexer.index()
+def _index_file(_file, parse_data_handler):
+    _indexer = Indexer(_file, parse_data_handler)
+    return _indexer.index()
 
 
-def index_logs(log_folder_path, parse_file_path):
-    parse_data = _get_parse_data(parse_file_path)
-    parse_data_handler = ParserData(parse_data)
+def index_logs(log_folder_path, parse_data_handler):
     mapping = parse_data_handler.get_es_mapping_data()
     put_mapping(mapping)
-    relevant_files = _get_relevant_files_from_pattern(parse_data_handler, log_folder_path)
 
+    relevant_files = _get_relevant_files_from_pattern(parse_data_handler, log_folder_path)
     results = []
     if DEBUG: # remove parallel
         for _file in relevant_files:
-            results.append(_index_file(_file, parse_data))
+            results.append(_index_file(_file, parse_data_handler))
     else:
         with Pool(processes=10) as _pool:
-            results = _pool.starmap(_index_file, zip(relevant_files, repeat(parse_data)))
+            results = _pool.starmap(_index_file, zip(relevant_files, repeat(parse_data_handler)))
     print (results)
-
-
-def analyze_logs():
-    engine = AnalyzerEngine()
-    engine.run()
 
 def main(log_folder_path, parse_file_path):
     set_logger()
@@ -104,8 +93,22 @@ def main(log_folder_path, parse_file_path):
     logging.info("######   Quali  Analyzer   ######")
     logging.info("#################################")
     logging.info("")
-    # index_logs(log_folder_path, parse_file_path)
-    analyze_logs()
+
+    # get data from config
+    parse_data = _get_parse_data(parse_file_path)
+    parse_data_handler = ParserData(parse_data)
+    
+    # index results in ES
+    index_logs(log_folder_path, parse_data_handler)
+
+    # analyze ES data
+    engine = AnalyzerEngine(parse_data["analyze"])
+    results = engine.run()
+
+    #publish the results
+    reporter = ReportManager(parse_data["report"], results)
+    reporter.publish()
+
 
 
 

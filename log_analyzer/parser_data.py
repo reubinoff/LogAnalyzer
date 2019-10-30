@@ -45,12 +45,23 @@ class ParseLookupIndex(object):
         self._end_delimiter = self._lookup_index_raw_data.get("end_delimiter")
     
     def index_data(self, str_to_check):
-        index_start = 0 if self._start_delimiter is None else str_to_check.index(self._start_delimiter)
-        l = 0 if self._start_delimiter is None else  len(self._start_delimiter)
-        f1 = str_to_check[index_start + l:]
-        index_end = -1 if self._end_delimiter is None else f1.index(self._end_delimiter)
-        f2 = f1[:index_end]
-        f3 = f2.strip()
+        try:
+            index_start = 0 if self._start_delimiter is None else str_to_check.index(self._start_delimiter)
+            l = 0 if self._start_delimiter is None else  len(self._start_delimiter)
+            f1 = str_to_check[index_start + l:]
+        except Exception as e:
+            logging.error("didnt manage to get start_index for {} when start_delimiter is=[{}] and the search line={}".format(self._name, self._start_delimiter, str_to_check))
+            raise e
+        
+        try:
+            index_end = -1 if self._end_delimiter is None else f1.index(self._end_delimiter)
+            f2 = f1[:index_end]
+            f3 = f2.strip()
+        except Exception as e:
+            logging.error("didnt manage to get end_index for {} when end_delimiter is=[{}] and the search line={}".format(self._name, self._end_delimiter, str_to_check))
+            raise e
+        
+       
         f3 = f3 if self._type is None else getattr(self, "_" + self._type)(f3)
 
         return {
