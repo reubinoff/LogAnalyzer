@@ -102,7 +102,9 @@ def main(log_folder_path, parse_file_path):
     parse_data_handler = ParserData(parse_data)
     index_logs(log_folder_path, parse_data_handler)
     results = analyze_logs(parse_data)
-    print(results)
+    RESUL_FILE = "log_analyzer_result.json"
+    with open(RESUL_FILE, 'w') as f:
+        json.dump(results, f, indent=4)
 
 
 

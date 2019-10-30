@@ -64,7 +64,7 @@
                     "args": {
                             "first_index": "start_reservation",
                             "threshold": {
-                                "max": 10
+                                "max": 0.1
                             }
                     }
                 }]
