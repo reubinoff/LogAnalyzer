@@ -73,7 +73,7 @@
         }
     ],
     "report":{
-        "report_id": "",
+        "report_id": "moshe",
         "report_file_name": "log_analyzer_result.json"
     }
 }
