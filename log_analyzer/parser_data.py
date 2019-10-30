@@ -49,6 +49,7 @@ class ParseLookupIndex(object):
             index_start = 0 if self._start_delimiter is None else str_to_check.index(self._start_delimiter)
         except Exception as e:
             logging.error("didnt manage to get start_index for {} when start_delimiter is=[{}] and the search line={}".format(self._name, self._start_delimiter, str_to_check))
+            raise e
         l = 0 if self._start_delimiter is None else  len(self._start_delimiter)
         f1 = str_to_check[index_start + l:]
         index_end = -1 if self._end_delimiter is None else f1.index(self._end_delimiter)
