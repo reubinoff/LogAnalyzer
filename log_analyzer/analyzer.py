@@ -11,6 +11,8 @@ from itertools import repeat
 
 from log_analyzer.indexer import Indexer
 from log_analyzer.parser_data import ParserData
+from log_analyzer.analyzer_engine import AnalyzerEngine
+from log_analyzer.elastic_handler import put_mapping
 
 DEBUG = True
  
@@ -77,6 +79,8 @@ def _index_file(_file, parse_data):
 def index_logs(log_folder_path, parse_file_path):
     parse_data = _get_parse_data(parse_file_path)
     parse_data_handler = ParserData(parse_data)
+    mapping = parse_data_handler.get_es_mapping_data()
+    put_mapping(mapping)
     relevant_files = _get_relevant_files_from_pattern(parse_data_handler, log_folder_path)
 
     results = []
@@ -89,6 +93,10 @@ def index_logs(log_folder_path, parse_file_path):
     print (results)
 
 
+def analyze_logs():
+    engine = AnalyzerEngine()
+    engine.run()
+
 def main(log_folder_path, parse_file_path):
     set_logger()
     logging.info("")
@@ -96,7 +104,8 @@ def main(log_folder_path, parse_file_path):
     logging.info("######   Quali  Analyzer   ######")
     logging.info("#################################")
     logging.info("")
-    index_logs(log_folder_path, parse_file_path)
+    # index_logs(log_folder_path, parse_file_path)
+    analyze_logs()
 
 
 
