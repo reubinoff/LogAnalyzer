@@ -23,59 +23,7 @@ class Indexer(object):
                 if len(val) > 0:
                     for key, value in dict(val).items():
                         data = { i["name"] : i["value"]  for i in value }
-                        data.update({"event": key})
-                        res = self._es.index(index="3rd", body=data)
+                        res = self._es.index(index=key, body=data)
         logging.info("Total scanned lines in file {} is {}".format(self._file, len(lines)))
         return True
     
-        
-
-#   "Blueprint resolution": {
-#             "log_files": [
-#                 "JobPerformance.txt.*"
-#             ],
-#             "lookup": [
-#                 {
-#                     "name": "start reservation",
-#                     "search": "Start Topology resolve for Job",
-#                     "index": [
-#                         {
-#                             "name": JOB_ID,
-#                             "start_delimiter": "resolve for Job",
-#                             "end_delimiter": ","
-#                         },
-#                         {
-#                             "name": RESERVATION_ID,
-#                             "start_delimiter": "creating Reservation",
-#                             "end_delimiter": ","
-#                         },
-#                         {
-#                             "name": TOPOLOGY_ID,
-#                             "start_delimiter": "Topology Id",
-#                             "end_delimiter": ","
-#                         }
-#                     ]
-#                 },
-#                 {
-#                     "name": "end reservation",
-#                     "search": "Topology resolve Succeeded for Job",
-#                     "index": [
-#                         {
-#                             "name": JOB_ID,
-#                             "start_delimiter": "for Job",
-#                             "end_delimiter": ","
-#                         },
-#                         {
-#                             "name": RESERVATION_ID,
-#                             "start_delimiter": "creating Reservation",
-#                             "end_delimiter": ","
-#                         },
-#                         {
-#                             "name": TOPOLOGY_ID,
-#                             "start_delimiter": "Topology Id",
-#                             "end_delimiter": ","
-#                         }
-#                     ]
-#                 }
-#             ]
-#         }

@@ -27,6 +27,13 @@ class ParseLookupIndex(object):
         self._end_delimiter = None
         self._parse()
     
+    def get_es_fields(self):
+        obj = {}
+        for k,v in self._lookup_index_raw_data.items():
+            if k.startswith("es_"):
+                obj.update({k.replace("es_",""): v})
+        return obj
+
     def _parse(self):
         if "name" not in self._lookup_index_raw_data:
             raise KeyError("name")
@@ -79,7 +86,8 @@ class ParseLookup(object):
             "name": "time",
             "start_delimiter": None,
             "end_delimiter": "[",
-            "type": "datetime"
+            "type": "datetime",
+            "es_type": "float"
         }
         p = ParseLookupIndex(index)
         self._index.append(p)
@@ -110,7 +118,12 @@ class ParseLookup(object):
         for index in self._index:
             index_data.append(index.index_data(str_to_check))
         return index_data
-
+    
+    def get_mapping_data(self):
+        data = []
+        for index in self._index:
+            data.append({index._name:  index.get_es_fields()})
+        return data
 
 
 class SignleParseData(object):
@@ -155,10 +168,16 @@ class SignleParseData(object):
                 index.update({lookup._name: val})
         return index
 
-
-
-
-
+    def get_mapping_data(self):
+        mapping = {}
+        for lookup in self._lookup_parsers:
+            mapping.update(
+                {
+                    lookup._name:  lookup.get_mapping_data()
+                }
+            )
+        return mapping 
+            
 class ParserData(object):
     def __init__(self, parse_raw_data):
         self._raw_data = parse_raw_data
@@ -169,6 +188,18 @@ class ParserData(object):
     @property
     def valid(self):
         return self._is_valid
+
+    def get_es_mapping_data(self):
+        index_data = {}
+        for parser in self._parsers:
+            a = parser.get_mapping_data()
+            for index, values in a.items():
+                index_data.update({index: {}})
+                for val in values:
+                    for k,v in val.items():
+                        mapping = v if len(v) > 0 else {"type": "keyword"}
+                        index_data[index].update({k: mapping})
+        return index_data
 
     def get_all_files(self):
         """ get all the files from the config to search """
