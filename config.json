@@ -57,23 +57,15 @@
             "measurment": {
                 "data": {
                     "keys": ["job_id", "reservation_id", "topology_id"],
-                    "index_items": {
-                        "start_reservation": {
-                            "fields": [
-                                "time"
-                            ]
-                        },
-                        "end_reservation": {
-                            "fields": [
-                                "time"
-                            ]
-                        }
-                    }
+                    "index_items": ["start_reservation", "end_reservation"]
                 },
                 "tests":[{
                     "name": "time_perioed",
                     "args": {
-                            "first_index": "start_reservation"
+                            "first_index": "start_reservation",
+                            "threshold": {
+                                "max": 10
+                            }
                     }
                 }]
             }

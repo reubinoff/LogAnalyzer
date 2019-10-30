@@ -58,7 +58,7 @@ class ParseLookupIndex(object):
             f2 = f1[:index_end]
             f3 = f2.strip()
         except Exception as e:
-            logging.error("didnt manage to get end_index for {} when end_delimiter is=[{}] and the search line={}".format(self._name, self._start_delimiter, str_to_check))
+            logging.error("didnt manage to get end_index for {} when end_delimiter is=[{}] and the search line={}".format(self._name, self._end_delimiter, str_to_check))
             raise e
         
        
