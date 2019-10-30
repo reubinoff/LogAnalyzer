@@ -6,10 +6,10 @@ CONFIG = {
         {
             "name": "reservation",
             "description": "measure the duration of reservation",
-            "indices": [
-                {
+            "measurment": {
+                "data": {
                     "keys": ["job_id", "reservation_id", "topology_id"],
-                    "indice_items": {
+                    "index_items": {
                         "start_reservation": {
                             "fields": [
                                 "time"
@@ -20,18 +20,16 @@ CONFIG = {
                                 "time"
                             ]
                         }
-                    },
-                    "measurment":{
-                        "test":[
-                            {
-                                "name": "time_perioed",
-                                "type": "time_between_indices",
-                                "args": ["start_reservation", "end_reservation"]
-                            }
-                        ]
                     }
-                }
-            ]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_reservation"
+                    }
+                }]
+            }
+
         }
     ]
 }
@@ -41,33 +39,32 @@ class AnalyzeItem(object):
         self._data = analyze_data
         self._name = self._data["name"]
         self._description = self._data["description"]
-        self._indices = self._data["indices"]
+        self._measurment = self._data["measurment"]
 
-    def _get_query(self):
-        q = dict({
-            "query": {
-                "match_all": {}
-            },
-            "aggs": {
-                "bulks": {
-                    "terms": {
-                        "field": "reservation_id.keyword",
-                        "size": 10
-                    },
-                    "aggs": {
-                        "orders": {
-                            "top_hits": {
-                                "size": 10
-                            }
-                        }
-                    }
-                }
-            }
-        })
-        return q
+    def _invoke_tests(self):
+        test_results = {}
+        for test in self._measurment["tests"]:
+            test_cb = self._get_measurment(test["name"])
+            test_data = self._measurment["data"]
+            result = test_cb(test_data, test["args"])
+            test_results.update({test["name"]: result})
+        return test_results
+        
+
+    def _get_measurment(self, name):
+        return getattr(self, "_measurment_" + name)
+
+
+    def _measurment_time_perioed(self, measurment_data, test_args=None):
+        indexes = measurment_data.get("index_items")
+        if len(indexes.keys()) != 2:
+            raise Exception("Invalid Parameters for test time_perioed")
+        first_arg = test_args["first_index"]
+        
     def analyze(self):
-        res = self._es.search(index="3rd", body=self._get_query()) 
-        print(res)
+        result = {self._name: self._invoke_tests()}
+        print(result)
+        return result
             
 
 

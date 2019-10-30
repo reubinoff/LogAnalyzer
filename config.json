@@ -49,5 +49,35 @@
                 }
             ]
         }
-    }
+    },
+    "analyze":[
+        {
+            "name": "reservation",
+            "description": "measure the duration of reservation",
+            "measurment": {
+                "data": {
+                    "keys": ["job_id", "reservation_id", "topology_id"],
+                    "index_items": {
+                        "start_reservation": {
+                            "fields": [
+                                "time"
+                            ]
+                        },
+                        "end_reservation": {
+                            "fields": [
+                                "time"
+                            ]
+                        }
+                    }
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_reservation"
+                    }
+                }]
+            }
+
+        }
+    ]
 }
