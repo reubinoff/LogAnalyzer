@@ -23,3 +23,6 @@ def put_mapping(data):
             es.indices.delete(index)
         res = es.indices.create(index=index, body=dict({"mappings":{"properties": mapping}}))
         print(res)
+
+# TODO: Create Factory to generate ES handler. put the factory in singleton which get the configuration from the config at once,
+#  and return factory instance for relevant configuration. the factory will create new ES instance for each call of get_elastic

@@ -5,30 +5,6 @@ from log_analyzer.elastic_handler import get_elastic
 
 MAX_RESULT = 1000
 
-CONFIG = {
-    "analyze":[
-        {
-            "name": "reservation",
-            "description": "measure the duration of reservation",
-            "measurment": {
-                "data": {
-                    "keys": ["job_id", "reservation_id", "topology_id"],
-                    "index_items": ["start_reservation", "end_reservation"]
-                },
-                "tests":[{
-                    "name": "time_perioed",
-                    "args": {
-                            "first_index": "start_reservation",
-                            "threshold": {
-                                "max": 10
-                            }
-                    }
-                }]
-            }
-
-        }
-    ]
-}
 class AnalyzeItem(object):
     def __init__(self, analyze_data):
         self._es = get_elastic()
@@ -131,11 +107,11 @@ class AnalyzerEngine(object):
     
 
     def run(self):
-        results = []
+        results = {}
         for analyze_item in self._data:
             item = AnalyzeItem(analyze_item)
             res = item.analyze()
-            results.append(res)
+            results.update(res)
         return results
 
 

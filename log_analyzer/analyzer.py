@@ -13,6 +13,7 @@ from log_analyzer.indexer import Indexer
 from log_analyzer.parser_data import ParserData
 from log_analyzer.analyzer_engine import AnalyzerEngine
 from log_analyzer.elastic_handler import put_mapping
+from log_analyzer.report_manager import ReportManager
 
 DEBUG = True
  
@@ -72,11 +73,10 @@ def _index_file(_file, parse_data_handler):
 
 
 def index_logs(log_folder_path, parse_data_handler):
-   
     mapping = parse_data_handler.get_es_mapping_data()
     put_mapping(mapping)
-    relevant_files = _get_relevant_files_from_pattern(parse_data_handler, log_folder_path)
 
+    relevant_files = _get_relevant_files_from_pattern(parse_data_handler, log_folder_path)
     results = []
     if DEBUG: # remove parallel
         for _file in relevant_files:
@@ -86,11 +86,6 @@ def index_logs(log_folder_path, parse_data_handler):
             results = _pool.starmap(_index_file, zip(relevant_files, repeat(parse_data_handler)))
     print (results)
 
-
-def analyze_logs(parse_data):
-    engine = AnalyzerEngine(parse_data["analyze"])
-    return engine.run()
-
 def main(log_folder_path, parse_file_path):
     set_logger()
     logging.info("")
@@ -98,11 +93,22 @@ def main(log_folder_path, parse_file_path):
     logging.info("######   Quali  Analyzer   ######")
     logging.info("#################################")
     logging.info("")
+
+    # get data from config
     parse_data = _get_parse_data(parse_file_path)
     parse_data_handler = ParserData(parse_data)
+    
+    # index results in ES
     index_logs(log_folder_path, parse_data_handler)
-    results = analyze_logs(parse_data)
-    print(results)
+
+    # analyze ES data
+    engine = AnalyzerEngine(parse_data["analyze"])
+    results = engine.run()
+
+    #publish the results
+    reporter = ReportManager(parse_data["report"], results)
+    reporter.publish()
+
 
 
 

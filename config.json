@@ -64,12 +64,15 @@
                     "args": {
                             "first_index": "start_reservation",
                             "threshold": {
-                                "max": 10
+                                "max": 0.1
                             }
                     }
                 }]
             }
 
         }
-    ]
+    ],
+    "report":{
+        "report_file_name": "log_analyzer_result.json"
+    }
 }
