@@ -74,5 +74,9 @@
     ],
     "report":{
         "report_file_name": "log_analyzer_result.json"
+    },
+    "connection": {
+        "host": "localhost",
+        "port": 9999
     }
 }
