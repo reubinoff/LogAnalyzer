@@ -35,23 +35,22 @@ class ElasticSearchService(object):
 class ElasticSearchFactory:
     _host = ''
     _port = 0
-    _ElasticSearchFactory = None
-
-    def __init__(self):
-        _ElasticSearchFactory = ElasticSearchFactory()
+    _instance = None
 
     @staticmethod
     def getInstance():
-        global _ElasticSearchFactory
-        return _ElasticSearchFactory
 
-    def config(host, port):
-        _host = host
-        _port = port
+        if(ElasticSearchFactory._instance is None):
+            ElasticSearchFactory._instance = ElasticSearchFactory()
+
+        return ElasticSearchFactory._instance
+
+    def config(self, host, port):
+        self._host = host
+        self._port = port
 
     def get_elastic(self):
-        global _host, _port
-        return ElasticSearchService(_host, _port)
+        return ElasticSearchService(self._host, self._port)
 
 
 

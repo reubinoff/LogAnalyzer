@@ -1,7 +1,7 @@
 import json
 import datetime
 import logging
-from log_analyzer.elastic_handler import get_elastic
+from log_analyzer.elastic_handler import ElasticSearchFactory
 from elasticsearch import helpers
 
 MAX_CHUNK_SIZE = 1000
@@ -10,7 +10,7 @@ class ReportManager(object):
     def __init__(self, report_config, report_data):
         self._report_config = report_config
         self._report_data = report_data
-        self._es = get_elastic()
+        self._es = ElasticSearchFactory.getInstance().get_elastic()
 
     def publish(self):
         with open(self._report_config.get("report_file_name", "log_analyzer_result.json"), 'w') as f:
