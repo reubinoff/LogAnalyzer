@@ -35,7 +35,7 @@ class ReportManager(object):
                     }
                     for r in test_results]
                 total_results_data.extend(actions)
-        helpers.streaming_bulk(self._es, total_results_data, chunk_size=MAX_CHUNK_SIZE)
+        r= helpers.bulk(self._es, total_results_data, chunk_size=MAX_CHUNK_SIZE)
         logging.info("Total results: {}".format(len(total_results_data)))
 
 
