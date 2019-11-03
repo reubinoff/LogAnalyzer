@@ -12,6 +12,11 @@ class AnalyzeItem(object):
         self._name = self._data["name"]
         self._description = self._data["description"]
         self._measurment = self._data["measurment"]
+        self._enabled = self._data.get("enabled", True)
+
+    @property
+    def enabled(self):
+        return self._enabled
 
     def _invoke_tests(self):
         test_results = {}
@@ -110,8 +115,9 @@ class AnalyzerEngine(object):
         results = {}
         for analyze_item in self._data:
             item = AnalyzeItem(analyze_item)
-            res = item.analyze()
-            results.update(res)
+            if item.enabled:
+                res = item.analyze()
+                results.update(res)
         return results
 
 
