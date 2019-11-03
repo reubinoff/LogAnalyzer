@@ -278,8 +278,27 @@
     },
     "analyze":[
         {
-            "name": "reservation",
-            "description": "measure the duration of reservation",
+            "name": "reservation_resolution_count",
+            "description": "TESTTESTTEST",
+            "measurment": {
+                "data": {
+                    "keys": ["job_id", "reservation_id"],
+                    "index_items": ["start_topology_resolution", "end_topology_resolution"]
+                },
+                "tests":[{
+                    "name": "count_events",
+                    "args": {
+                            "first_index": "start_topology_resolution",
+                            "sample_period_in_sec": "10"
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "reservation_resolution_duration",
+            "description": "measure the duration of reservation resolution",
+            "enabled": false,
             "measurment": {
                 "data": {
                     "keys": ["job_id", "reservation_id", "topology_id"],
@@ -296,9 +315,136 @@
                 }]
             }
 
+        },
+        {
+            "name": "reservation_creation_duration",
+            "description": "measure the duration of reservation creation",
+            "enabled": false,
+            "measurment": {
+                "data": {
+                    "keys": ["job_id", "reservation_id"],
+                    "index_items": ["start_new_reservation_command", "end_new_reservation_command"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_new_reservation_command",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "reservation_resolution_and_creation_duration",
+            "description": "measure the duration of reservation resolution and creation",
+            "enabled": false,
+            "measurment": {
+                "data": {
+                    "keys": ["job_id", "reservation_id"],
+                    "index_items": ["start_topology_resolution", "end_new_reservation_command"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_topology_resolution",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "T1",
+            "description": "measure T1 duration",
+            "enabled": false,
+            "measurment": {
+                "data": {
+                    "keys": ["job_id", "reservation_id"],
+                    "index_items": ["scheduled_job", "end_new_reservation_command"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "scheduled_job",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "T2_T6",
+            "description": "measure T2 and T6 duration",
+            "enabled": false,
+            "measurment": {
+                "data": {
+                    "keys": ["script_name", "internal_execution_id"],
+                    "index_items": ["start_venv_init", "end_venv_init"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_venv_init",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "T3_T7",
+            "description": "measure T3 and T7 duration",
+            "enabled": false,
+            "measurment": {
+                "data": {
+                    "keys": ["internal_execution_id"],
+                    "index_items": ["start_command", "end_command"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_command",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "T4_and_T5",
+            "description": "measure T4 and T5 duration",
+            "enabled": false,
+            "measurment": {
+                "data": {
+                    "keys": ["test_request_execution_id"],
+                    "index_items": ["start_test_execution", "end_test_execution"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_test_execution",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                }]
+            }
+
         }
     ],
     "report":{
-        "report_file_name": "log_analyzer_result.json"
+        "report_file_name": "log_analyzer_result.json",
+        "report_id": "moshe_results"
     }
 }
