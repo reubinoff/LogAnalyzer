@@ -80,7 +80,11 @@ class AnalyzeItem(object):
         
         second_arg = [x for x in indexes if x!=first_arg][0]
         for result in itesm_src:
-            values = {key: result[key] for key in measurment_data["keys"]}
+            values = dict()
+            try:
+                values = {key: result[key] for key in measurment_data["keys"]}
+            except Exception as e:
+                logging.fatal(e)
             results = self._get__all_results(second_arg, values)
             data = self._get_source_data(results)
             if len(data) == 0:

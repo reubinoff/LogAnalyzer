@@ -277,24 +277,7 @@
         }
     },
     "analyze":[
-        {
-            "name": "reservation_resolution_count",
-            "description": "TESTTESTTEST",
-            "measurment": {
-                "data": {
-                    "keys": ["job_id", "reservation_id"],
-                    "index_items": ["start_topology_resolution", "end_topology_resolution"]
-                },
-                "tests":[{
-                    "name": "count_events",
-                    "args": {
-                            "first_index": "start_topology_resolution",
-                            "sample_period_in_sec": "10"
-                    }
-                }]
-            }
-
-        },
+   
         {
             "name": "reservation_resolution_duration",
             "description": "measure the duration of reservation resolution",
@@ -382,10 +365,10 @@
         {
             "name": "T2_T6",
             "description": "measure T2 and T6 duration",
-            "enabled": false,
+            "enabled": true,
             "measurment": {
                 "data": {
-                    "keys": ["script_name", "internal_execution_id"],
+                    "keys": ["internal_execution_id"],
                     "index_items": ["start_venv_init", "end_venv_init"]
                 },
                 "tests":[{
@@ -395,6 +378,13 @@
                             "threshold": {
                                 "max": 0.1
                             }
+                    }
+                },
+                {
+                    "name": "count_events",
+                    "args": {
+                            "first_index": "start_venv_init",
+                            "sample_period_in_sec": "1"
                     }
                 }]
             }
