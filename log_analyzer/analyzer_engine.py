@@ -1,13 +1,13 @@
 
 import logging
 
-from log_analyzer.elastic_handler import get_elastic
+from log_analyzer.elastic_handler import ElasticSearchFactory
 
 MAX_RESULT = 1000
 
 class AnalyzeItem(object):
     def __init__(self, analyze_data):
-        self._es = get_elastic()
+        self._es = ElasticSearchFactory.getInstance().get_elastic()
         self._data = analyze_data
         self._name = self._data["name"]
         self._description = self._data["description"]

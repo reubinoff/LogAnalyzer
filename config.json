@@ -1,4 +1,8 @@
 {
+      "connection": {
+        "host": "localhost",
+        "port": 9999
+      }
     "patterns": {
         "blueprint_resolution": {
             "log_files": [

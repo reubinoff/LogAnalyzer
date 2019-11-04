@@ -1,13 +1,13 @@
 import logging 
 
-from log_analyzer.elastic_handler import get_elastic
+from log_analyzer.elastic_handler import ElasticSearchFactory
 from elasticsearch import helpers
 
 MAX_CHUNK_SIZE = 1000
 
 class Indexer(object):
     def __init__(self, file_to_index, parser_data):
-        self._es = get_elastic()
+        self._es = ElasticSearchFactory.getInstance().get_elastic()
         self._file = file_to_index
         self._parser_data_object = parser_data
     
