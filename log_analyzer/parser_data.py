@@ -125,16 +125,12 @@ class ParseLookup(object):
     def index_parsed_data(self, str_to_check):
         if self.can_parsed_string(str_to_check) is False:
             return False
-        index_data = []
         for index in self._index:
-            index_data.append(index.index_data(str_to_check))
-        return index_data
+            yield index.index_data(str_to_check)
     
     def get_mapping_data(self):
-        data = []
         for index in self._index:
-            data.append({index._name:  index.get_es_fields()})
-        return data
+            yield {index._name:  index.get_es_fields()}
 
 
 class SignleParseData(object):

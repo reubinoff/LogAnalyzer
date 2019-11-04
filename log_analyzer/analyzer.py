@@ -46,11 +46,9 @@ def _get_parse_data(parse_file_path):
 
 def _get_all_full_path_files_in_dir(dir_name):
     """ get all logs to read """
-    files = []
     for dirpath, _, filenames in os.walk(dir_name):
         for _file in filenames:
-            files.append(os.path.join(dirpath, _file))
-    return files
+            yield os.path.join(dirpath, _file)
 
 def _path_leaf(path):
     head, tail = ntpath.split(path)
@@ -58,14 +56,11 @@ def _path_leaf(path):
 
 def _get_relevant_files_from_pattern(parse_data_handler, log_folder_path):
     files_pattern_to_search = parse_data_handler.get_all_files()
-    files = _get_all_full_path_files_in_dir(log_folder_path)
-    relevant_files = []
-    for f in files:
+    for f in  _get_all_full_path_files_in_dir(log_folder_path):
         file_name = _path_leaf(f)
         for pattern in files_pattern_to_search:
             if bool(re.match(pattern, file_name)) is True:
-                relevant_files.append(f)
-    return relevant_files
+                yield f
 
 def _index_file(_file, parse_data_handler):
     _indexer = Indexer(_file, parse_data_handler)
@@ -74,7 +69,7 @@ def _index_file(_file, parse_data_handler):
 
 def index_logs(log_folder_path, parse_data_handler):
     mapping = parse_data_handler.get_es_mapping_data()
-    ElasticSearchFactory.getInstance().get_elastic().put_mapping(mapping)
+    ElasticSearchFactory.getInstance().put_mapping(mapping)
 
     relevant_files = _get_relevant_files_from_pattern(parse_data_handler, log_folder_path)
     results = []
