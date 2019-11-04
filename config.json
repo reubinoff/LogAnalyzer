@@ -1,68 +1,433 @@
 {
+      "connection": {
+        "host": "localhost",
+        "port": 9999
+      }
     "patterns": {
-        "Blueprint resolution": {
+        "blueprint_resolution": {
             "log_files": [
                 "JobPerformance.txt.*"
             ],
             "lookup": [
                 {
-                    "name": "start_reservation",
+                    "name": "start_topology_resolution",
                     "search_str": "Start Topology resolve for Job",
                     "index": [
                         {
                             "name": "job_id",
-                            "start_delimiter": "resolve for Job",
+                            "start_delimiter": "job_id:",
                             "end_delimiter": ","
                         },
                         {
                             "name": "reservation_id",
-                            "start_delimiter": "creating Reservation",
+                            "start_delimiter": "reservation_id:",
                             "end_delimiter": ","
                         },
                         {
                             "name": "topology_id",
-                            "start_delimiter": "Topology Id",
+                            "start_delimiter": "topology_id:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "topology_name",
+                            "start_delimiter": "topology_name:",
                             "end_delimiter": ","
                         }
                     ]
                 },
                 {
-                    "name": "end_reservation",
+                    "name": "end_topology_resolution",
                     "search_str": "Topology resolve Succeeded for Job",
                     "index": [
                         {
                             "name": "job_id",
-                            "start_delimiter": "for Job",
+                            "start_delimiter": "job_id:",
                             "end_delimiter": ","
                         },
                         {
                             "name": "reservation_id",
-                            "start_delimiter": "creating Reservation",
+                            "start_delimiter": "reservation_id:",
                             "end_delimiter": ","
                         },
                         {
                             "name": "topology_id",
-                            "start_delimiter": "Topology Id",
+                            "start_delimiter": "topology_id:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "topology_name",
+                            "start_delimiter": "topology_name:",
+                            "end_delimiter": ","
+                        }
+                    ]
+                },
+                {
+                    "name": "add_pending_job",
+                    "search_str": "Added job to pending queue",
+                    "index":[
+                        {
+                            "name": "job_id",
+                            "start_delimiter": "job_id:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "job_name",
+                            "start_delimiter": "job_name:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "test_execution_id",
+                            "start_delimiter": "execution_id:",
+                            "end_delimiter": ","
+                        }
+                    ]
+                },
+                {
+                    "name": "start_new_reservation_command",
+                    "search_str": "Start Executing NewReservation Command for Job",
+                    "index": [
+                        {
+                            "name": "job_id",
+                            "start_delimiter": "job_id:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "reservation_id",
+                            "start_delimiter": "reservation_id:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "topology_id",
+                            "start_delimiter": "topology_id:",
+                            "end_delimiter": ","
+                        }
+                    ]
+                },
+                {
+                    "name": "end_new_reservation_command",
+                    "search_str": "Finished Execution New Reservation command for Reservation",
+                    "index": [
+                        {
+                            "name": "job_id",
+                            "start_delimiter": "job_id:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "reservation_id",
+                            "start_delimiter": "reservation_id:",
+                            "end_delimiter": ","
+                        }
+                    ]
+                },
+                {
+                    "name": "scheduled_job",
+                    "search_str": "Scheduled Job",
+                    "index": [
+                        {
+                            "name": "job_id",
+                            "start_delimiter": "job_id:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "reservation_id",
+                            "start_delimiter": "reservation_id:",
+                            "end_delimiter": ","
+                        }
+                    ]
+                },
+                {
+                    "name": "test_execution_ended",
+                    "search_str": "Execution Ended",
+                    "index": [
+                        {
+                            "name": "test_execution_id",
+                            "start_delimiter": "execution_id:",
+                            "end_delimiter": ","
+                        }
+                    ]
+                },
+                {
+                    "name": "finished_job",
+                    "search_str": "Finished Job",
+                    "index": [
+                        {
+                            "name": "job_id",
+                            "start_delimiter": "job_id:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "reservation_id",
+                            "start_delimiter": "reservation_id:",
                             "end_delimiter": ","
                         }
                     ]
                 }
             ]
+        },
+        "command_provisioning": {
+            "log_files":[
+                "CommandInJobPerformance.txt.*"
+            ],
+            "lookup":[
+                {
+                    "name": "start_command",
+                    "search_str": "Starting Command Execution",
+                    "index":[
+                        {
+                            "name": "script_name",
+                            "start_delimiter":"script_name:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "reservation_id",
+                            "start_delimiter":"reservation_id:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "internal_execution_id",
+                            "start_delimiter": "internal_execution_id:",
+                            "end_delimiter": ","
+                        }
+                    ]
+                },
+                {
+                    "name": "end_command",
+                    "search_str": "Command Execution Ended",
+                    "index":[     
+                        {
+                            "name": "internal_execution_id",
+                            "start_delimiter": "internal_execution_id:",
+                            "end_delimiter": ","
+                        }
+                    ]
+                },             
+                {
+                    "name": "start_venv_init",
+                    "search_str": "Starting venv initialization for Command",
+                    "index": [
+                        {
+                            "name": "script_name",
+                            "start_delimiter":"script_name:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "internal_execution_id",
+                            "start_delimiter": "internal_execution_id:",
+                            "end_delimiter": ","
+                        }
+                    ]
+                },                
+                {
+                    "name": "end_venv_init",
+                    "search_str": "Finished venv initialization for Command",
+                    "index": [
+                        {
+                            "name": "script_name",
+                            "start_delimiter":"script_name:",
+                            "end_delimiter": ","
+                        },
+                        {
+                            "name": "internal_execution_id",
+                            "start_delimiter": "internal_execution_id:",
+                            "end_delimiter": ","
+                        }
+                    ]
+                }
+            ]
+        },
+        "test_execution": {
+            "log_files": [
+                "TestHostInJobPerformance.txt.*"
+            ],
+            "lookup":[
+                {
+                    "name": "start_test_execution",
+                    "search_str": "Starting Test Execution",
+                    "index": [
+                        {
+                            "name": "test_request_execution_id",
+                            "start_delimiter": "test_request_execution_id:",
+                            "end_delimiter": ","                            
+                        },
+                        {
+                            "name": "test_path",
+                            "start_delimiter": "test_path:",
+                            "end_delimiter": ","            
+                        },
+                        {
+                            "name": "reservation_id",
+                            "start_delimiter": "reservation_id:",
+                            "end_delimiter": "," 
+                        },
+                        {
+                            "name": "job_id",
+                            "start_delimiter": "job_id:",
+                            "end_delimiter": "," 
+                        }
+                    ]
+                },
+                {
+                    "name": "end_test_execution",
+                    "search_str": "Finished test execution",
+                    "index": [
+                        {
+                            "name": "test_request_execution_id",
+                            "start_delimiter": "test_request_execution_id:"
+                        }
+                    ]
+                }
+            ]
+            
         }
     },
     "analyze":[
+   
         {
-            "name": "reservation",
-            "description": "measure the duration of reservation",
+            "name": "reservation_resolution_duration",
+            "description": "measure the duration of reservation resolution",
+            "enabled": false,
             "measurment": {
                 "data": {
                     "keys": ["job_id", "reservation_id", "topology_id"],
-                    "index_items": ["start_reservation", "end_reservation"]
+                    "index_items": ["start_topology_resolution", "end_topology_resolution"]
                 },
                 "tests":[{
                     "name": "time_perioed",
                     "args": {
-                            "first_index": "start_reservation",
+                            "first_index": "start_topology_resolution",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "reservation_creation_duration",
+            "description": "measure the duration of reservation creation",
+            "enabled": false,
+            "measurment": {
+                "data": {
+                    "keys": ["job_id", "reservation_id"],
+                    "index_items": ["start_new_reservation_command", "end_new_reservation_command"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_new_reservation_command",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "reservation_resolution_and_creation_duration",
+            "description": "measure the duration of reservation resolution and creation",
+            "enabled": false,
+            "measurment": {
+                "data": {
+                    "keys": ["job_id", "reservation_id"],
+                    "index_items": ["start_topology_resolution", "end_new_reservation_command"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_topology_resolution",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "T1",
+            "description": "measure T1 duration",
+            "enabled": false,
+            "measurment": {
+                "data": {
+                    "keys": ["job_id", "reservation_id"],
+                    "index_items": ["scheduled_job", "end_new_reservation_command"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "scheduled_job",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "T2_T6",
+            "description": "measure T2 and T6 duration",
+            "enabled": true,
+            "measurment": {
+                "data": {
+                    "keys": ["internal_execution_id"],
+                    "index_items": ["start_venv_init", "end_venv_init"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_venv_init",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                },
+                {
+                    "name": "count_events",
+                    "args": {
+                            "first_index": "start_venv_init",
+                            "sample_period_in_sec": "1"
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "T3_T7",
+            "description": "measure T3 and T7 duration",
+            "enabled": false,
+            "measurment": {
+                "data": {
+                    "keys": ["internal_execution_id"],
+                    "index_items": ["start_command", "end_command"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_command",
+                            "threshold": {
+                                "max": 0.1
+                            }
+                    }
+                }]
+            }
+
+        },
+        {
+            "name": "T4_and_T5",
+            "description": "measure T4 and T5 duration",
+            "enabled": false,
+            "measurment": {
+                "data": {
+                    "keys": ["test_request_execution_id"],
+                    "index_items": ["start_test_execution", "end_test_execution"]
+                },
+                "tests":[{
+                    "name": "time_perioed",
+                    "args": {
+                            "first_index": "start_test_execution",
                             "threshold": {
                                 "max": 0.1
                             }
@@ -73,10 +438,7 @@
         }
     ],
     "report":{
-        "report_file_name": "log_analyzer_result.json"
-    },
-    "connection": {
-        "host": "localhost",
-        "port": 9999
+        "report_file_name": "log_analyzer_result.json",
+        "report_id": "moshe_results"
     }
 }

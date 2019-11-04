@@ -22,7 +22,7 @@ class ReportManager(object):
         total_results_data = []
         for analyze_name, analyze_value in  self._report_data.items():
             for test_name, test_results in analyze_value.items():
-                index_name = F"{analyze_name}_{test_name}_{report_id}"
+                index_name = F"{analyze_name.rstrip()}_{test_name.rstrip()}_{report_id}".lower()
                 if self._es.indices.exists(index_name):
                     self._es.indices.delete(index_name)
                     self._es.indices.create(index=index_name)
@@ -35,7 +35,7 @@ class ReportManager(object):
                     }
                     for r in test_results]
                 total_results_data.extend(actions)
-        r= helpers.bulk(self._es, total_results_data, chunk_size=MAX_CHUNK_SIZE)
+        r = helpers.bulk(self._es, total_results_data, chunk_size=MAX_CHUNK_SIZE)
         logging.info("Total results: {}".format(len(total_results_data)))
 
 
