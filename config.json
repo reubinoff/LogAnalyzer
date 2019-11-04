@@ -1,8 +1,8 @@
 {
-      "connection": {
+    "connection": {
         "host": "localhost",
-        "port": 9999
-      }
+        "port": 9300
+    },
     "patterns": {
         "blueprint_resolution": {
             "log_files": [
@@ -64,7 +64,7 @@
                 {
                     "name": "add_pending_job",
                     "search_str": "Added job to pending queue",
-                    "index":[
+                    "index": [
                         {
                             "name": "job_id",
                             "start_delimiter": "job_id:",
@@ -165,22 +165,22 @@
             ]
         },
         "command_provisioning": {
-            "log_files":[
+            "log_files": [
                 "CommandInJobPerformance.txt.*"
             ],
-            "lookup":[
+            "lookup": [
                 {
                     "name": "start_command",
                     "search_str": "Starting Command Execution",
-                    "index":[
+                    "index": [
                         {
                             "name": "script_name",
-                            "start_delimiter":"script_name:",
+                            "start_delimiter": "script_name:",
                             "end_delimiter": ","
                         },
                         {
                             "name": "reservation_id",
-                            "start_delimiter":"reservation_id:",
+                            "start_delimiter": "reservation_id:",
                             "end_delimiter": ","
                         },
                         {
@@ -193,21 +193,21 @@
                 {
                     "name": "end_command",
                     "search_str": "Command Execution Ended",
-                    "index":[     
+                    "index": [
                         {
                             "name": "internal_execution_id",
                             "start_delimiter": "internal_execution_id:",
                             "end_delimiter": ","
                         }
                     ]
-                },             
+                },
                 {
                     "name": "start_venv_init",
                     "search_str": "Starting venv initialization for Command",
                     "index": [
                         {
                             "name": "script_name",
-                            "start_delimiter":"script_name:",
+                            "start_delimiter": "script_name:",
                             "end_delimiter": ","
                         },
                         {
@@ -216,14 +216,14 @@
                             "end_delimiter": ","
                         }
                     ]
-                },                
+                },
                 {
                     "name": "end_venv_init",
                     "search_str": "Finished venv initialization for Command",
                     "index": [
                         {
                             "name": "script_name",
-                            "start_delimiter":"script_name:",
+                            "start_delimiter": "script_name:",
                             "end_delimiter": ","
                         },
                         {
@@ -239,7 +239,7 @@
             "log_files": [
                 "TestHostInJobPerformance.txt.*"
             ],
-            "lookup":[
+            "lookup": [
                 {
                     "name": "start_test_execution",
                     "search_str": "Starting Test Execution",
@@ -247,22 +247,22 @@
                         {
                             "name": "test_request_execution_id",
                             "start_delimiter": "test_request_execution_id:",
-                            "end_delimiter": ","                            
+                            "end_delimiter": ","
                         },
                         {
                             "name": "test_path",
                             "start_delimiter": "test_path:",
-                            "end_delimiter": ","            
+                            "end_delimiter": ","
                         },
                         {
                             "name": "reservation_id",
                             "start_delimiter": "reservation_id:",
-                            "end_delimiter": "," 
+                            "end_delimiter": ","
                         },
                         {
                             "name": "job_id",
                             "start_delimiter": "job_id:",
-                            "end_delimiter": "," 
+                            "end_delimiter": ","
                         }
                     ]
                 },
@@ -277,31 +277,37 @@
                     ]
                 }
             ]
-            
         }
     },
-    "analyze":[
-   
+    "analyze": [
         {
             "name": "reservation_resolution_duration",
             "description": "measure the duration of reservation resolution",
             "enabled": false,
             "measurment": {
                 "data": {
-                    "keys": ["job_id", "reservation_id", "topology_id"],
-                    "index_items": ["start_topology_resolution", "end_topology_resolution"]
+                    "keys": [
+                        "job_id",
+                        "reservation_id",
+                        "topology_id"
+                    ],
+                    "index_items": [
+                        "start_topology_resolution",
+                        "end_topology_resolution"
+                    ]
                 },
-                "tests":[{
-                    "name": "time_perioed",
-                    "args": {
+                "tests": [
+                    {
+                        "name": "time_perioed",
+                        "args": {
                             "first_index": "start_topology_resolution",
                             "threshold": {
                                 "max": 0.1
                             }
+                        }
                     }
-                }]
+                ]
             }
-
         },
         {
             "name": "reservation_creation_duration",
@@ -309,20 +315,27 @@
             "enabled": false,
             "measurment": {
                 "data": {
-                    "keys": ["job_id", "reservation_id"],
-                    "index_items": ["start_new_reservation_command", "end_new_reservation_command"]
+                    "keys": [
+                        "job_id",
+                        "reservation_id"
+                    ],
+                    "index_items": [
+                        "start_new_reservation_command",
+                        "end_new_reservation_command"
+                    ]
                 },
-                "tests":[{
-                    "name": "time_perioed",
-                    "args": {
+                "tests": [
+                    {
+                        "name": "time_perioed",
+                        "args": {
                             "first_index": "start_new_reservation_command",
                             "threshold": {
                                 "max": 0.1
                             }
+                        }
                     }
-                }]
+                ]
             }
-
         },
         {
             "name": "reservation_resolution_and_creation_duration",
@@ -330,20 +343,27 @@
             "enabled": false,
             "measurment": {
                 "data": {
-                    "keys": ["job_id", "reservation_id"],
-                    "index_items": ["start_topology_resolution", "end_new_reservation_command"]
+                    "keys": [
+                        "job_id",
+                        "reservation_id"
+                    ],
+                    "index_items": [
+                        "start_topology_resolution",
+                        "end_new_reservation_command"
+                    ]
                 },
-                "tests":[{
-                    "name": "time_perioed",
-                    "args": {
+                "tests": [
+                    {
+                        "name": "time_perioed",
+                        "args": {
                             "first_index": "start_topology_resolution",
                             "threshold": {
                                 "max": 0.1
                             }
+                        }
                     }
-                }]
+                ]
             }
-
         },
         {
             "name": "T1",
@@ -351,20 +371,27 @@
             "enabled": false,
             "measurment": {
                 "data": {
-                    "keys": ["job_id", "reservation_id"],
-                    "index_items": ["scheduled_job", "end_new_reservation_command"]
+                    "keys": [
+                        "job_id",
+                        "reservation_id"
+                    ],
+                    "index_items": [
+                        "scheduled_job",
+                        "end_new_reservation_command"
+                    ]
                 },
-                "tests":[{
-                    "name": "time_perioed",
-                    "args": {
+                "tests": [
+                    {
+                        "name": "time_perioed",
+                        "args": {
                             "first_index": "scheduled_job",
                             "threshold": {
                                 "max": 0.1
                             }
+                        }
                     }
-                }]
+                ]
             }
-
         },
         {
             "name": "T2_T6",
@@ -372,27 +399,33 @@
             "enabled": true,
             "measurment": {
                 "data": {
-                    "keys": ["internal_execution_id"],
-                    "index_items": ["start_venv_init", "end_venv_init"]
+                    "keys": [
+                        "internal_execution_id"
+                    ],
+                    "index_items": [
+                        "start_venv_init",
+                        "end_venv_init"
+                    ]
                 },
-                "tests":[{
-                    "name": "time_perioed",
-                    "args": {
+                "tests": [
+                    {
+                        "name": "time_perioed",
+                        "args": {
                             "first_index": "start_venv_init",
                             "threshold": {
                                 "max": 0.1
                             }
-                    }
-                },
-                {
-                    "name": "count_events",
-                    "args": {
+                        }
+                    },
+                    {
+                        "name": "count_events",
+                        "args": {
                             "first_index": "start_venv_init",
                             "sample_period_in_sec": "1"
+                        }
                     }
-                }]
+                ]
             }
-
         },
         {
             "name": "T3_T7",
@@ -400,20 +433,26 @@
             "enabled": false,
             "measurment": {
                 "data": {
-                    "keys": ["internal_execution_id"],
-                    "index_items": ["start_command", "end_command"]
+                    "keys": [
+                        "internal_execution_id"
+                    ],
+                    "index_items": [
+                        "start_command",
+                        "end_command"
+                    ]
                 },
-                "tests":[{
-                    "name": "time_perioed",
-                    "args": {
+                "tests": [
+                    {
+                        "name": "time_perioed",
+                        "args": {
                             "first_index": "start_command",
                             "threshold": {
                                 "max": 0.1
                             }
+                        }
                     }
-                }]
+                ]
             }
-
         },
         {
             "name": "T4_and_T5",
@@ -421,23 +460,29 @@
             "enabled": false,
             "measurment": {
                 "data": {
-                    "keys": ["test_request_execution_id"],
-                    "index_items": ["start_test_execution", "end_test_execution"]
+                    "keys": [
+                        "test_request_execution_id"
+                    ],
+                    "index_items": [
+                        "start_test_execution",
+                        "end_test_execution"
+                    ]
                 },
-                "tests":[{
-                    "name": "time_perioed",
-                    "args": {
+                "tests": [
+                    {
+                        "name": "time_perioed",
+                        "args": {
                             "first_index": "start_test_execution",
                             "threshold": {
                                 "max": 0.1
                             }
+                        }
                     }
-                }]
+                ]
             }
-
         }
     ],
-    "report":{
+    "report": {
         "report_file_name": "log_analyzer_result.json",
         "report_id": "moshe_results"
     }
