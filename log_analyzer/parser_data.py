@@ -171,7 +171,7 @@ class SignleParseData(object):
         index = {}
         for lookup in self._lookup_parsers:
             val = lookup.index_parsed_data(str_to_check)
-            if isinstance(val, bool) is False and len(val) > 0:
+            if isinstance(val, bool) is False and len(list(val)) > 0:
                 index.update({lookup._name: val})
         return index
 

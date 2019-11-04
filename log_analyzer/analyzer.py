@@ -15,7 +15,7 @@ from log_analyzer.analyzer_engine import AnalyzerEngine
 from log_analyzer.elastic_handler import ElasticSearchFactory
 from log_analyzer.report_manager import ReportManager
 
-DEBUG = True
+DEBUG = False
  
 
 def set_logger():
@@ -62,12 +62,14 @@ def _get_relevant_files_from_pattern(parse_data_handler, log_folder_path):
             if bool(re.match(pattern, file_name)) is True:
                 yield f
 
-def _index_file(_file, parse_data_handler):
+def _index_file(_file, parse_data_handler, connection=None):
+    if connection is not None:
+        ElasticSearchFactory.getInstance().config(connection['host'], connection['port'])
     _indexer = Indexer(_file, parse_data_handler)
     return _indexer.index()
 
 
-def index_logs(log_folder_path, parse_data_handler):
+def index_logs(log_folder_path, parse_data_handler, connection):
     mapping = parse_data_handler.get_es_mapping_data()
     ElasticSearchFactory.getInstance().put_mapping(mapping)
 
@@ -78,7 +80,7 @@ def index_logs(log_folder_path, parse_data_handler):
             results.append(_index_file(_file, parse_data_handler))
     else:
         with Pool(processes=10) as _pool:
-            results = _pool.starmap(_index_file, zip(relevant_files, repeat(parse_data_handler)))
+            results = _pool.starmap(_index_file, zip(relevant_files, repeat(parse_data_handler), repeat(connection)))
     print (results)
 
 def main(log_folder_path, parse_file_path):
@@ -97,7 +99,7 @@ def main(log_folder_path, parse_file_path):
     ElasticSearchFactory.getInstance().config(connection['host'], connection['port'])
 
     # index results in ES
-    index_logs(log_folder_path, parse_data_handler)
+    index_logs(log_folder_path, parse_data_handler, connection)
 
     # analyze ES data
     engine = AnalyzerEngine(parse_data["analyze"])
