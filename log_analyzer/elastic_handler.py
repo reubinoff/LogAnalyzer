@@ -32,9 +32,9 @@ class ElasticSearchService(object):
 # Factory to generate ES handler. put the factory in singleton which get the configuration from the config at once,
 # and return factory instance for relevant configuration. the factory will create new ES instance for each call of get_elastic
 
-class ElasticSearchFactory:
-    _host = ''
-    _port = 0
+class ElasticSearchFactory(object):
+    _host = None
+    _port = None
     _instance = None
 
     @staticmethod
@@ -50,6 +50,9 @@ class ElasticSearchFactory:
         self._port = port
 
     def get_elastic(self):
+        if self._host is None or self._port is None:
+            logging.error("Please run factory config before create instance")
+            return None
         return ElasticSearchService(self._host, self._port)
 
 

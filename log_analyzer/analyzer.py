@@ -98,7 +98,8 @@ def main(log_folder_path, parse_file_path):
     parse_data = _get_parse_data(parse_file_path)
     parse_data_handler = ParserData(parse_data)
 
-    ElasticSearchFactory.getInstance().config(parse_data['connection']['host'], parse_data['connection']['port'])
+    connection = parse_data['connection']
+    ElasticSearchFactory.getInstance().config(connection['host'], connection['port'])
 
     # index results in ES
     index_logs(log_folder_path, parse_data_handler)
