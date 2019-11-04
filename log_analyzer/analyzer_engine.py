@@ -99,6 +99,10 @@ class AnalyzeItem(object):
             end_time = end_time if end_time > arg_2["time"] else arg_2["time"]
             event_pairs.append((result["time"], arg_2["time"]))
 
+        if end_time is None:
+            logging.warning("No result found for " +self._name)
+            return []
+            
         sample_period_in_sec = test_args["sample_period_in_sec"]
         times_array = range(round(init_time)-1, round(end_time)+1, int(sample_period_in_sec))
 
