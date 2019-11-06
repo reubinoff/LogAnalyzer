@@ -106,3 +106,4 @@ test_config.json
 .vscode/
 log_analyzer_result.json
 .idea/
+outputs/
